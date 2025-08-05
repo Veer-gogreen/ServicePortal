@@ -1,122 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Service Portal</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .hidden { display: none; }
-    .section { margin-top: 30px; }
-  </style>
-</head>
-<body>
-<div class="container mt-4">
-  <h2 class="text-center mb-4">Service & Maintenance Portal</h2>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial; margin: 30px; }
+      input, select, button { display: block; margin: 10px 0; width: 300px; padding: 8px; }
+      .section { margin-bottom: 30px; }
+      h2 { color: green; }
+    </style>
+  </head>
+  <body>
+    <h1>Service & Maintenance Portal</h1>
 
-  <!-- Customer Registration -->
-  <h4>Customer Registration</h4>
-  <form id="customerForm" class="mb-4">
-    <input type="text" class="form-control mb-2" id="custName" placeholder="Name" required>
-    <input type="tel" class="form-control mb-2" id="custMobile" placeholder="Mobile" required>
-    <input type="text" class="form-control mb-2" id="custAddress" placeholder="Address" required>
-    <input type="password" class="form-control mb-2" id="custPassword" placeholder="Password" required>
-    <button class="btn btn-primary">Register Customer</button>
-  </form>
+    <div class="section">
+      <h2>Customer Registration</h2>
+      <input id="custName" placeholder="Name" required>
+      <input id="custAddress" placeholder="Address" required>
+      <input id="custMobile" placeholder="Mobile Number" required>
+      <input id="custPassword" placeholder="Password" type="password" required>
+      <button onclick="registerCustomer()">Register</button>
+    </div>
 
-  <!-- Technician Registration -->
-  <h4>Technician Registration</h4>
-  <form id="technicianForm" class="mb-4">
-    <input type="text" class="form-control mb-2" id="techName" placeholder="Name" required>
-    <input type="text" class="form-control mb-2" id="techQual" placeholder="Qualification" required>
-    <input type="tel" class="form-control mb-2" id="techContact" placeholder="Mobile" required>
-    <input type="text" class="form-control mb-2" id="techAddress" placeholder="Address" required>
-    <input type="password" class="form-control mb-2" id="techPassword" placeholder="Password" required>
-    <button class="btn btn-primary">Register Technician</button>
-  </form>
+    <div class="section">
+      <h2>Technician Registration</h2>
+      <input id="techName" placeholder="Name" required>
+      <input id="techQual" placeholder="Qualification" required>
+      <input id="techExp" placeholder="Experience" required>
+      <input id="techSpec" placeholder="Specialisation" required>
+      <input id="techMobile" placeholder="Mobile Number" required>
+      <input id="techAddr" placeholder="Address" required>
+      <input id="techPassword" placeholder="Password" type="password" required>
+      <button onclick="registerTechnician()">Register</button>
+    </div>
 
-  <!-- Login Section -->
-  <h4>Login</h4>
-  <form id="loginForm" class="mb-4">
-    <select class="form-select mb-2" id="loginType">
-      <option value="customer">Customer</option>
-      <option value="technician">Technician</option>
-    </select>
-    <input type="tel" class="form-control mb-2" id="loginMobile" placeholder="Mobile" required>
-    <input type="password" class="form-control mb-2" id="loginPassword" placeholder="Password" required>
-    <button class="btn btn-success">Login</button>
-  </form>
+    <div class="section">
+      <h2>Login</h2>
+      <select id="loginRole">
+        <option>Customer</option>
+        <option>Technician</option>
+      </select>
+      <input id="loginMobile" placeholder="Mobile Number">
+      <input id="loginPassword" placeholder="Password" type="password">
+      <button onclick="loginUser()">Login</button>
+      <div id="loginResult"></div>
+    </div>
 
-  <!-- Work Allotment (Admin) -->
-  <h4>Admin Work Allotment</h4>
-  <form id="assignForm" class="mb-4">
-    <input type="tel" class="form-control mb-2" id="assignMobile" placeholder="Technician Mobile" required>
-    <input type="text" class="form-control mb-2" id="assignWork" placeholder="Work Detail" required>
-    <button class="btn btn-warning">Assign Work</button>
-  </form>
+    <div class="section">
+      <h2>Admin Approval Panel</h2>
+      <button onclick="loadApprovals()">Load Pending Approvals</button>
+      <div id="approvalList"></div>
+    </div>
 
-  <div id="outputMsg" class="text-success mt-3"></div>
-</div>
+    <div class="section">
+      <h2>Assign Work (Admin)</h2>
+      <input id="taskCustomer" placeholder="Customer Name">
+      <input id="taskTechnician" placeholder="Technician Name">
+      <input id="taskDetail" placeholder="Task Detail">
+      <button onclick="assignWork()">Assign Task</button>
+    </div>
 
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbyFX4qTatu1Lynpq-v4dWZsekRvNFJYyce_Zdy6ajJT0_LvATzwIehl8Ybmcmz6RuXbDA/exec";
+    <script>
+      function registerCustomer() {
+        const data = {
+          name: custName.value,
+          address: custAddress.value,
+          mobile: custMobile.value,
+          password: custPassword.value
+        };
+        google.script.run.registerCustomer(data);
+        alert("Customer registered. Awaiting approval.");
+      }
 
-// Customer Registration
-document.getElementById("customerForm").onsubmit = async (e) => {
-  e.preventDefault();
-  const data = {
-    action: "registerCustomer",
-    name: custName.value,
-    mobile: custMobile.value,
-    address: custAddress.value,
-    password: custPassword.value
-  };
-  const res = await fetch(scriptURL, { method: 'POST', body: new URLSearchParams(data) });
-  document.getElementById("outputMsg").innerText = await res.text();
-  e.target.reset();
-};
+      function registerTechnician() {
+        const data = {
+          name: techName.value,
+          qualification: techQual.value,
+          experience: techExp.value,
+          specialisation: techSpec.value,
+          mobile: techMobile.value,
+          address: techAddr.value,
+          password: techPassword.value
+        };
+        google.script.run.registerTechnician(data);
+        alert("Technician registered. Awaiting approval.");
+      }
 
-// Technician Registration
-document.getElementById("technicianForm").onsubmit = async (e) => {
-  e.preventDefault();
-  const data = {
-    action: "registerTechnician",
-    name: techName.value,
-    qualification: techQual.value,
-    contact: techContact.value,
-    address: techAddress.value,
-    password: techPassword.value
-  };
-  const res = await fetch(scriptURL, { method: 'POST', body: new URLSearchParams(data) });
-  document.getElementById("outputMsg").innerText = await res.text();
-  e.target.reset();
-};
+      function loginUser() {
+        const role = loginRole.value;
+        const mobile = loginMobile.value;
+        const password = loginPassword.value;
+        google.script.run.withSuccessHandler(function(res) {
+          loginResult.innerText = res.success ? `Welcome ${res.name}` : "Invalid login or not approved yet.";
+        }).loginUser(role, mobile, password);
+      }
 
-// Login
-document.getElementById("loginForm").onsubmit = async (e) => {
-  e.preventDefault();
-  const loginType = loginType.value;
-  const data = {
-    action: loginType === "customer" ? "loginCustomer" : "loginTechnician",
-    mobile: loginMobile.value,
-    password: loginPassword.value
-  };
-  const res = await fetch(scriptURL, { method: 'POST', body: new URLSearchParams(data) });
-  const text = await res.text();
-  document.getElementById("outputMsg").innerText = text === "success" ? "Login Successful!" : "Login Failed or Awaiting Approval";
-};
+      function loadApprovals() {
+        google.script.run.withSuccessHandler(function(data) {
+          let html = "<h3>Pending Customers</h3>";
+          data.customers.forEach((c, i) => {
+            html += `${c[0]} - ${c[2]} <button onclick="approve('Customers', ${i})">Approve</button><br>`;
+          });
+          html += "<h3>Pending Technicians</h3>";
+          data.technicians.forEach((t, i) => {
+            html += `${t[0]} - ${t[4]} <button onclick="approve('Technicians', ${i})">Approve</button><br>`;
+          });
+          approvalList.innerHTML = html;
+        }).getPendingRegistrations();
+      }
 
-// Admin Work Allotment
-document.getElementById("assignForm").onsubmit = async (e) => {
-  e.preventDefault();
-  const data = {
-    action: "assignWork",
-    technicianMobile: assignMobile.value,
-    workDetail: assignWork.value
-  };
-  const res = await fetch(scriptURL, { method: 'POST', body: new URLSearchParams(data) });
-  document.getElementById("outputMsg").innerText = await res.text();
-  e.target.reset();
-};
-</script>
-</body>
+      function approve(type, index) {
+        google.script.run.approveRegistration(type, index);
+        alert(`${type.slice(0, -1)} approved.`);
+        loadApprovals();
+      }
+
+      function assignWork() {
+        const data = {
+          customer: taskCustomer.value,
+          technician: taskTechnician.value,
+          task: taskDetail.value
+        };
+        google.script.run.assignTask(data);
+        alert("Task Assigned.");
+      }
+    </script>
+  </body>
 </html>
